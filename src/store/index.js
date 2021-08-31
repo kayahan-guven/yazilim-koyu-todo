@@ -15,7 +15,11 @@ export default new Vuex.Store({
             state.lists.push({
                 name: 'Yeni Liste',
                 description: '',
-                items: [],
+                items: [{
+                    name: 'Yeni item',
+                    note: '',
+                    endDate: new Date().toDateString()
+                }],
                 information: ''
             });
         },
@@ -26,7 +30,19 @@ export default new Vuex.Store({
 
         changeItemName (state, { index, listName}) {
             state.lists[index].name = listName;
-        }
+        },
+
+        addListItem (state, index) {
+            state.lists[index].items.push({
+                name: 'Yeni item',
+                note: '',
+                endDate: new Date().toDateString()
+            });
+        },
+
+        changeListItemName (state, { listIndex, index, itemName }) {
+            state.lists[listIndex].items[index].name = itemName;
+        },
     },
 
     actions: {
@@ -40,6 +56,14 @@ export default new Vuex.Store({
 
         changeItemName ({ commit }, payload) {
             commit('changeItemName', payload);
+        },
+
+        changeListItemName ({ commit }, payload) {
+            commit('changeListItemName', payload);
+        },
+
+        addListItem ({ commit }, payload) {
+            commit('addListItem', payload);
         }
     },
 

@@ -52,6 +52,7 @@
 
           editName () {
               this.canEdit = true;
+              this.$emit('setCurrentList', this.index);
           },
 
           saveChangedName () {

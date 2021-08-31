@@ -8,13 +8,30 @@
       <div class="my-list-container">
         <search-box @setSearch="setFilterName"></search-box>
         <div v-for="(list,index) in myList" :key="list">
-          <my-list :data="list" :index="index"></my-list>
+          <my-list
+              :data="list"
+              :index="index"
+              @setCurrentList="setCurrentList"></my-list>
         </div>
       </div>
       <add-list></add-list>
     </div>
     <div class="right-block">
-      No Reminders
+        <div v-if="!myList.length">No reminders!</div>
+        <div v-else>
+            {{ myList[currentListIndex].name }}:
+            <font-awesome-icon
+                icon="plus-circle"
+                class="icon"
+                @click="addNewItemToList"/>
+            <div v-for="(item, index) in myList[currentListIndex].items" :key="item">
+                <list-item
+                    :data="item"
+                    :list-index="currentListIndex"
+                    :index="index"
+                ></list-item>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -25,9 +42,11 @@ import SearchBox from "./../components/SearchBox"
 import Widgets from "./../components/Widgets"
 import MyList from "./../components/MyList"
 import AddList from "./../components/AddList"
+import ListItem from "@/components/ListItem";
 
 export default {
   components: {
+      ListItem,
     SearchBox,
     Widgets,
     MyList,
@@ -57,7 +76,12 @@ export default {
           value: 0,
           text: 'Flag'
         }
-      ]
+      ],
+        currentListIndex: 0,
+        todayList: [],
+        scheduledList: [],
+        currentList: [],
+        currentHeader: ''
     }
   },
 
@@ -69,11 +93,34 @@ export default {
 
   methods: {
       ...mapActions([
-        'setFilterNameForList'
+        'setFilterNameForList',
+          'addListItem'
       ]),
 
       setFilterName ({ target }) {
         this.setFilterNameForList(target.value);
+      },
+
+      setCurrentList (index) {
+          console.log(index);
+          this.currentListIndex = index;
+      },
+
+      addNewItemToList () {
+          this.addListItem(this.currentListIndex);
+          this.pushToList(this.myList[this.currentListIndex].items.slice(-1)[0])
+      },
+
+      isItemDueToday (date) {
+          const today = new Date().toDateString();
+          return date === today;
+      },
+
+      pushToList (item) {
+          console.log(item);
+          this.isItemDueToday(item.endDate)
+              ? this.todayList.push(item)
+              : this.scheduledList.push(item);
       }
   }
 }
@@ -117,7 +164,6 @@ export default {
 
   .right-block {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
   }
 </style>
